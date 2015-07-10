@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
+RAKE_SCRIPT=$(which rake)
+ruby --debug -S rdebug $RAKE_SCRIPT $@

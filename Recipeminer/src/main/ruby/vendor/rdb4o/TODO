@@ -1,0 +1,12 @@
+TODO:
+
+Whoa, this list would be way to long.
+Basically is totally unstable. But sometimes it works ;)
+
+- for sure we need some elegant sorting, it should be possible ot pass comparator in case of native queries
+- UUIDs 
+- easy way to configure it (activation depth and so on)
+- many-to-many relation
+- validations
+- sorting
+- limit/offset ( collection[5..15], collection[5, 10] )

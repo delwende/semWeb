@@ -1,0 +1,10 @@
+syntax: glob
+*.ipr
+*.iws
+*.iml
+nbproject
+.project
+Gemfile.lock
+
+syntax: regexp
+\.idea

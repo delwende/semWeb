@@ -1,0 +1,19 @@
+require 'ruby-debug'
+
+REPOS = [ 'http://www.ibiblio.org/maven2', 'http://source.db4o.com/maven' ]
+REPOS.each { |url| repositories.remote << url } 
+ 
+JRUBY = transitive('org.jruby:jruby:jar:1.6.5')
+PERSISTENCE = [transitive('com.db4o:db4o-full-java5:jar:8.0-SNAPSHOT'),
+               transitive('com.google.code.gson:gson:jar:2.1')]
+JAVATOOLS = [transitive('log4j:log4j:jar:1.2.16'),
+             transitive('com.google.guava:guava:jar:10.0.1')]
+
+define 'recipeminer' do
+  project.version = '0.1'
+  compile.with [JRUBY, PERSISTENCE, JAVATOOLS]
+  package :jar
+  shell.using :jirb
+  run.using :main => 'de.recipeminer.tools.Config'
+end
+

@@ -1,0 +1,112 @@
+require 'rake'
+require 'rake/clean'
+require 'rubygems/package_task'
+require 'rdoc/task'
+require 'rake/testtask'
+require 'rspec/core'
+require 'rspec/core/rake_task'
+require 'ruby-debug'
+
+spec = Gem::Specification.new do |s|
+  s.name = 'recipeminer'
+  s.version = '0.0.1'
+  s.has_rdoc = true
+  s.extra_rdoc_files = ['README', 'LICENSE']
+  s.summary = 'Your summary here'
+  s.description = s.summary
+  s.author = ''
+  s.email = ''
+  # s.executables = ['your_executable_here']
+  s.files = %w(LICENSE README Rakefile) + 
+    Dir.glob("{bin,config,lib,main,spec}/**/*")
+  s.require_path = "lib"
+  s.bindir = "bin"
+end
+
+Gem::PackageTask.new(spec) do |p|
+  p.gem_spec = spec
+  p.need_tar = true
+  p.need_zip = true
+end
+ 
+RDoc::Task.new do |rdoc|
+  files =['README', 'LICENSE', 'lib/**/*.rb', 'main/**/*.rb']
+  rdoc.rdoc_files.add(files)
+  rdoc.main = "README" # page to start on
+  rdoc.title = "recipeminer Docs"
+  rdoc.rdoc_dir = 'doc/rdoc' # rdoc output folder
+  rdoc.options << '--line-numbers'
+end
+
+namespace :rspec do
+  RSpec::Core::RakeTask.new('all') do |t|
+  t.pattern = "spec/**/*_spec.rb"
+end
+  
+  RSpec::Core::RakeTask.new('debug') do |t|
+    t.rspec_opts = 
+      %w[--require lib/rspec_mod.rb 
+         --format DebuggerFormatter
+         --debugger]
+  end
+  
+  desc "Run a specific set of rspec examples"
+  task :run, :specs do |t, args|
+    require 'main/init'
+    require 'lib/rspec_mod'
+    arglist = args[:specs].split /[,; ]+/    
+    arglist = ['--format BaseTextFormatter'] + arglist
+    Debugger.start
+    debugger
+    puts 'calling run...'
+    RSpec::Core::Runner::run arglist
+  end
+  
+end
+
+
+
+#Rake::TestTask.new do |t|
+#  t.test_files = FileList['test/**/*.rb']
+#end
+
+def maven(*goals)
+  Dir.chdir("./recipeminer-java") { |path| system('/usr/bin/mvn', *goals)}
+end
+
+namespace :java do
+  desc "Use embedded Maven project to build the java components."
+  task :build do |t|
+    if File.directory?('./javalib')
+      puts "./javalibs already exists. Skipping Maven build. " +
+        "Use 'rake java:rebuild' to update java components."
+    else
+      maven "compile"
+    end
+  end
+  
+  desc "Clean compile artifacts of the Maven project and remove ./javalib"
+  task :clean do |t|
+    maven "clean"
+  end
+  
+  desc "Use embedded Maven project to rebuild the java components and ./javalib."
+  task :rebuild do |t|
+    maven("clean", "compile")
+  end
+end
+
+namespace :ruby do
+  desc 'Exports the entries of the loadpath of the used ruby runtime to a '
+    'flat text file in the Maven resource directory'
+  task :export_loadpath do |t|
+    debugger
+  end
+
+end
+
+desc "Run a ruby file of the project"
+task :run, :file do |t, args|
+  require 'main/init'
+  load args[:file]
+end

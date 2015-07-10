@@ -1,0 +1,66 @@
+#!/usr/bin/env jruby
+
+if ENV["DEV"]
+  require File.dirname(__FILE__) + "/../lib/jrodb"
+else
+  require 'rubygems'
+  require 'jrodb'
+end
+
+def usage
+  puts <<-USAGE
+  jrodb generate [directory]
+  jrodb compile [directory]
+
+For example:
+  jrodb generate app/models
+  jrodb compile app/models
+USAGE
+    exit
+end
+
+def cp
+  "#{Jrodb.jar_classpath}/db4o.jar:#{Jrodb.jar_classpath}/jrodb.jar:."
+end
+
+ENV["CLASSPATH"] = cp
+
+# puts "CLASSPATH=#{cp}"
+
+usage if ARGV.empty?
+
+case ARGV[0]  
+when "generate"
+  Dir[ARGV[1] + "/**/*.rb"].each do |file|
+    puts file
+    dir = File.dirname(file)
+    package = dir.gsub("/", ".")
+    dir += "/java"
+    
+    require file
+    
+    until Jrodb::Model::Generator.classes.empty?
+      klazz = Jrodb::Model::Generator.classes.pop
+      i klazz
+      Dir.mkdir(dir) unless File.exists?(dir)
+      File.open(dir + "/#{klazz}.java", "w") {|f| 
+        f.write Jrodb::Model::Generator.generate!(klazz, package) 
+      }
+    end
+  end
+  
+when "compile"
+  Dir[ARGV[1] + "/**/*.java"].each do |file|
+    cmd = "javac -cp #{cp} #{file}"
+    puts cmd
+    system(cmd)
+  end  
+when "run"
+  system "export CLASSPATH=#{cp}"
+  system "jruby #{ARGV[1]}"
+when "irb"
+  r = ARGV[1] ? "-r #{ARGV[1]}" : ""
+  system "jirb #{r}"
+else
+  usage
+end

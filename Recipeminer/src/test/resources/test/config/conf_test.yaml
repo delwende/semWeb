@@ -1,0 +1,7 @@
+:conf test:
+  :inner:
+    :value1: value1
+    :2: two
+    :list: ['a', 'heterogenous', "list", 42]
+    :symhash: [symkey: value]
+    :strhash: [strkey: value]

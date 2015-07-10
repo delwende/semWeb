@@ -1,0 +1,14 @@
+:crawling:
+  :chefkoch:
+    :uuid-prefix: CK#
+    :search-api:
+      :base-url: http://api.chefkoch.de/api/1.0/api-recipe-search.php
+      :format: ?Suchbegriff=&start=§start§&limit=§limit§
+      :query-param-defaults: {limit: 30}
+    :recipe-api:
+      :base-url: http://api.chefkoch.de/api/1.0/api-recipe.php?
+      :format: ID=§showid§
+      :query-params: [showid]
+  :rezepte-wiki:
+    :uuid-prefix: RW#
+    

@@ -1,2 +1,1 @@
-# semWeb
-CSV to RDF Parser
+#Semantic Web Project SS2015
